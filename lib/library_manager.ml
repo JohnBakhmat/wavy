@@ -20,10 +20,16 @@ let rec walk_dir (path:string):string list =
         in
         List.flatten (List.map process_entry entries)
 ;;
+
+let is_supported (file:string):bool =
+        let supported_extensions = ["mp3";"wav";"flac"] in
+        let supported (ext:string) =  String.ends_with ~suffix:ext file in
+        List.fold_left (||) false (List.map supported supported_extensions)
+;;
                 
 let main () = 
-        let dir = Sys.getcwd() in
-        let entries = walk_dir dir in
-        let res = String.concat "\n" entries in
+        let entries = walk_dir (Sys.getcwd ()) in
+        let supported_entries = List.filter is_supported entries in
+        let res = String.concat "\n" supported_entries in
         print_endline res;
 ;;
