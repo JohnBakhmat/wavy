@@ -1,0 +1,4 @@
+(executable
+ (public_name wavy)
+ (name main)
+ (libraries wavy))
