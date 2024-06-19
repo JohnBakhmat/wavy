@@ -1,10 +1,7 @@
 exception Dir_not_found
 
-let enter_dir(path:string):unit = 
-        match Sys.is_directory path with
-        | false -> raise Dir_not_found;
-        | true -> Sys.chdir path;
-;;
+let enter_dir (path : string) : unit =
+  if Sys.is_directory path then Sys.chdir path else raise Dir_not_found
 
 let process_file (path:string)=
         [path]
