@@ -4,7 +4,10 @@ let enter_dir (path : string) : unit =
   if Sys.is_directory path then Sys.chdir path else raise Dir_not_found
 ;;
 
-let process_file (path : string) = [ path ]
+let process_file (path : string) =
+  let _ = Parser.parse_file path in
+  [ path ]
+;;
 
 let rec walk_dir (path : string) : string list =
   let dir_entries = Sys.readdir path in
@@ -23,9 +26,7 @@ let is_supported (file : string) : bool =
 ;;
 
 let main () =
-  let entries =
-    walk_dir "/Users/johnbakhmat/Downloads/Bishu - microcelebrity LP- 2024 FLAC/"
-  in
+  let entries = walk_dir "/home/john/Music/Balatro Soundtrack/" in
   let supported_entries = List.filter is_supported entries in
   let res = String.concat "\n" supported_entries in
   print_endline res
