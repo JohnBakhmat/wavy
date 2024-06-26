@@ -4,7 +4,7 @@ exception Dir_not_found
 
 open Riot
 
-type Message.t += Check_fs
+type Message.t += Check_fs of string
 
 let enter_dir (path : string) : unit =
   if Sys.is_directory path then Sys.chdir path else raise Dir_not_found
@@ -33,7 +33,9 @@ let parse_all (_files : string list) =
 
 let rec main () =
   (match[@warning "-8"] receive_any () with
-   | Check_fs -> print_endline "Starting filesystem walk"
+   | Check_fs path ->
+     let paths = walk_dir path in
+     ()
    | _ -> print_endline "Huh wtf is this message?");
   main ()
 ;;
