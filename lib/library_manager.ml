@@ -26,7 +26,8 @@ let is_supported (file : string) : bool =
 ;;
 
 let main () =
-  let entries = walk_dir "/home/john/Music/Balatro Soundtrack/" in
+  enter_dir "/Users/johnbakhmat/Downloads/Bishu - microcelebrity LP- 2024 FLAC/";
+  let entries = walk_dir (Sys.getcwd()) in
   let supported_entries = List.filter is_supported entries in
   let res = String.concat "\n" supported_entries in
   print_endline res
