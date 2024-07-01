@@ -1,6 +1,7 @@
 (lang dune 3.16)
 
 (name wavy)
+(version cd5973f-dirty)
 
 (generate_opam_files true)
 
