@@ -26,11 +26,11 @@ let is_supported (file : string) : bool =
 ;;
 
 let get_library (path : string) =
-  print_endline "Starting to parse library";
+  Logger.debug (fun f -> f "Starting to parse library");
   let paths = walk_dir path in
-  print_endline "Got paths";
+  Logger.debug (fun f -> f "Got paths");
   let entries = Parser.parse_all paths in
-  print_endline "Parsed";
+  Logger.debug (fun f -> f "Parsed");
   let successful = entries |> List.filter (fun entry -> Result.is_ok entry) in
   let unwrapped = successful |> List.map (fun entry -> Result.get_ok entry) in
   unwrapped
@@ -40,7 +40,9 @@ let main () =
   (match[@warning "-8"] receive_any () with
    | Check_fs path ->
      let lib = get_library path in
-     lib |> List.map (fun x -> x.filepath) |> List.fold_left ( ^ ) "" |> print_endline
-   | _ -> print_endline "Huh wtf is this message?");
+     let str = lib |> List.map (fun x -> x.filepath) |> List.fold_left ( ^ ) "" in
+     Logger.debug (fun f -> f "Library: %s" str);
+     ()
+   | _ -> Logger.debug (fun f -> f "Huh wtf is this message?"));
   shutdown ()
 ;;

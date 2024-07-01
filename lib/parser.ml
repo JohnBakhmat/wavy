@@ -42,11 +42,26 @@ let parse_all (paths : string list) =
   let tasks =
     paths
     |> List.map (fun path ->
-      async (fun _ ->
+      async (fun () ->
         Logger.info (fun f -> f "Starting to parse %s" path);
         parse_file path))
   in
-  let task_results = tasks |> List.map (fun task -> await ~timeout:600L task) in
+  let task_results =
+    tasks
+    |> List.mapi (fun i task ->
+      let res = await ~timeout:100_000L task in
+      match res with
+      | Ok x ->
+        Logger.debug (fun f ->
+          f "Successfully parsed %s" ((Result.get_ok x).title |> Option.value ~default:""));
+        Ok x
+      | Error `Timeout ->
+        Logger.debug (fun f -> f "Request timed out %d" i);
+        Error `Timeout
+      | x ->
+        Logger.debug (fun f -> f "Unexpected error");
+        x)
+  in
   let results =
     task_results
     |> List.map (fun res ->

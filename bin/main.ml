@@ -6,7 +6,7 @@ let () =
   let open Riot in
 
   let _ = Logger.start () |> Result.get_ok in
-  Logger.set_log_level (Some Info);
+  Logger.set_log_level (Some Trace);
 
   let lib_mngr_pid = spawn Library_manager.main in
   send
