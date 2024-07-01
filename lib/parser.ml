@@ -16,6 +16,7 @@ let deduplicate_left xs = List.rev (List.fold_left cons_uniq [] xs)
 let parse_file (filepath : string)
   : (music_info, [> `File_not_found | `Not_a_file ]) result
   =
+  Logger.info (fun f -> f "Starting to parse %s" filepath);
   let* _ = if Sys.file_exists filepath then Ok () else Error `File_not_found in
   let* _ = if Sys.is_regular_file filepath then Ok () else Error `Not_a_file in
   let info =
@@ -35,21 +36,16 @@ let parse_file (filepath : string)
            | _ -> r)
          { album = None; artist = None; title = None; filepath }
   in
+  Logger.info (fun f -> f "Finishing to parse %s" filepath);
   Ok info
 ;;
 
 let parse_all (paths : string list) =
-  let tasks =
-    paths
-    |> List.map (fun path ->
-      async (fun () ->
-        Logger.info (fun f -> f "Starting to parse %s" path);
-        parse_file path))
-  in
+  let tasks = paths |> List.map (fun path -> async (fun () -> parse_file path)) in
   let task_results =
     tasks
     |> List.mapi (fun i task ->
-      let res = await ~timeout:100_000L task in
+      let res = await ~timeout:100000_000L task in
       match res with
       | Ok x ->
         Logger.debug (fun f ->
