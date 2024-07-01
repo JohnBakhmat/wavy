@@ -1,6 +1,7 @@
 exception Dir_not_found
 
 open Riot
+open Parser
 
 type Message.t += Check_fs of string
 
@@ -24,15 +25,22 @@ let is_supported (file : string) : bool =
   List.fold_left ( || ) false (List.map supported supported_extensions)
 ;;
 
-
 let get_library (path : string) =
+  print_endline "Starting to parse library";
   let paths = walk_dir path in
-  let audio = Parser.parse_all paths in
-  audio
+  print_endline "Got paths";
+  let entries = Parser.parse_all paths in
+  print_endline "Parsed";
+  let successful = entries |> List.filter (fun entry -> Result.is_ok entry) in
+  let unwrapped = successful |> List.map (fun entry -> Result.get_ok entry) in
+  unwrapped
 ;;
 
 let main () =
   (match[@warning "-8"] receive_any () with
-   | Check_fs path -> get_library path
+   | Check_fs path ->
+     let lib = get_library path in
+     lib |> List.map (fun x -> x.filepath) |> List.fold_left ( ^ ) "" |> print_endline
    | _ -> print_endline "Huh wtf is this message?");
-  shutdown()
+  shutdown ()
+;;
